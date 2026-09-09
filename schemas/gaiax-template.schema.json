@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GaiaX Template (index.json)",
+  "description": "GaiaX 模板图层树。模板 = index.json（布局）+ index.css（样式）+ index.databinding（绑定）。",
+  "type": "object",
+  "required": ["id", "type"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "模板 ID = 根图层 ID，须与模板目录名一致；databinding/css 以它为关联键"
+    },
+    "type": {
+      "const": "gaia-template",
+      "description": "根节点固定为 gaia-template"
+    },
+    "sub-type": {
+      "type": "string",
+      "enum": ["scroll", "grid", "slider", "custom"],
+      "description": "仅 type=gaia-template 时有效：scroll 单列滚动 / grid 多列 / slider 轮播 / custom 嵌套子模板坑位（图层 id = 子模板 ID）；缺省等同 view"
+    },
+    "class": {
+      "type": "string",
+      "description": "index.css 样式选择器名，缺省用 id 兼作"
+    },
+    "layers": {
+      "type": "array",
+      "description": "子图层数组，递归结构",
+      "items": { "$ref": "#/definitions/layer" }
+    },
+    "exp-version": {
+      "type": "string",
+      "enum": ["V1", "V2"],
+      "description": "表达式版本：V1 旧版 ${var}/@{} 语法（需宿主注册扩展）；V2 缺省"
+    },
+    "preload": {
+      "type": "boolean",
+      "description": "预加载标记（仅 Android 读取）"
+    },
+    "uid": {
+      "type": "string",
+      "description": "工具链指纹，引擎不解析"
+    },
+    "package": {
+      "type": "object",
+      "description": "Studio 元数据（版本/依赖/约束尺寸），引擎不解析",
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "modify-timestamp": { "type": "string" },
+        "dependencies": {
+          "type": "object",
+          "description": "依赖的子模板及版本",
+          "additionalProperties": { "type": "string" }
+        },
+        "constraint-size": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" },
+            "zoom": { "type": "number" }
+          }
+        }
+      }
+    },
+
+    "view-class-android": {
+      "type": "string",
+      "description": "自定义组件的 Android 类全名（须实现 GXTemplateEngine.GXICustomViewBindData 且加 @Keep）；仅 custom 类型有意义"
+    },
+    "view-class-ios": {
+      "type": "string",
+      "description": "自定义组件的 iOS 类名（实现 gx_bindData:）；仅 custom 类型有意义"
+    },
+
+    "direction": {
+      "type": "string",
+      "enum": ["horizontal", "vertical"],
+      "description": "scroll/grid 布局方向。⚠️ scroll 默认值 Android/iOS 不同，务必显式写"
+    },
+    "column": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "grid 列数（≥1），仅 grid 容器有效"
+    },
+    "item-spacing": {
+      "type": "number",
+      "description": "主轴坑位间距（scroll/grid），写在容器图层上才有效"
+    },
+    "row-spacing": {
+      "type": "number",
+      "description": "grid 行间距"
+    },
+    "line-spacing": {
+      "type": "number",
+      "description": "兼容旧名 = item-spacing"
+    },
+    "interitem-spacing": {
+      "type": "number",
+      "description": "兼容旧名 = item-spacing"
+    },
+    "edge-insets": {
+      "type": "string",
+      "description": "容器内容内缩，格式 \"{top,left,bottom,right}\"，如 \"{0,0,0,0}\""
+    },
+    "gravity": {
+      "type": "string",
+      "enum": ["top", "bottom", "center"],
+      "description": "scroll 横滑时坑位垂直对齐（Android 有效）"
+    },
+    "scroll-enable": {
+      "type": "boolean",
+      "description": "grid 自身是否可滚动，默认 false"
+    },
+
+    "slider-scroll-time-interval": {
+      "type": "number",
+      "description": "slider 自动轮播间隔 ms，≤0 不自动滚，默认 3000"
+    },
+    "slider-infinity-scroll": {
+      "type": "boolean",
+      "description": "slider 无限循环，默认 true"
+    },
+    "slider-has-indicator": {
+      "type": "boolean",
+      "description": "slider 是否显示指示器，默认 true"
+    },
+    "slider-selected-index": {
+      "type": "integer",
+      "description": "slider 初始页，默认 0"
+    },
+    "slider-indicator-selected-color": {
+      "type": "string",
+      "description": "指示器选中点颜色，默认 #FFFFFF"
+    },
+    "slider-indicator-unselected-color": {
+      "type": "string",
+      "description": "指示器未选中点颜色，默认 #BBBBBB"
+    },
+    "slider-indicator-margin": {
+      "type": "string",
+      "description": "指示器边距 {t,l,b,r}"
+    },
+    "slider-indicator-position": {
+      "type": "string",
+      "description": "指示器位置，如 top-left / bottom-center"
+    },
+    "slider-indicator-class-android": {
+      "type": "string",
+      "description": "自定义指示器类（须继承 GXSliderBaseIndicatorView）"
+    },
+    "slider-indicator-class-ios": {
+      "type": "string",
+      "description": "iOS 自定义指示器类"
+    },
+
+    "stroke-color": {
+      "type": "string",
+      "description": "progress 前景色。⚠️ Android 默认 #0000FF / iOS 默认 #ff0000，务必显式写"
+    },
+    "trail-color": {
+      "type": "string",
+      "description": "progress 背景轨道色。⚠️ 两端默认不同，务必显式写"
+    },
+    "progress-type": {
+      "type": "string",
+      "enum": ["line"],
+      "description": "progress 形态（当前仅 line）"
+    },
+    "animated": {
+      "type": "boolean",
+      "description": "progress 数值变化是否动画"
+    }
+  },
+  "definitions": {
+    "layer": {
+      "type": "object",
+      "description": "图层节点",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "图层唯一 ID：databinding（data/event/track/animation）与 css 选择器的关联键；嵌套坑位时 = 子模板 templateId。⚠️ 数据键名禁含 '-'"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["gaia-template", "view", "text", "image", "richtext", "iconfont", "progress", "custom"],
+          "description": "控件类型：gaia-template 模板根/容器/嵌套坑位；view 布局盒子；text 文本；image 图片；richtext 富文本；iconfont 字体图标；progress 进度条；custom 原生自定义组件"
+        },
+        "sub-type": {
+          "type": "string",
+          "enum": ["scroll", "grid", "slider", "custom"],
+          "description": "仅 type=gaia-template 时有效"
+        },
+        "class": {
+          "type": "string",
+          "description": "css 样式选择器名，缺省用 id 兼作"
+        },
+        "layers": {
+          "type": "array",
+          "description": "子图层（递归）",
+          "items": { "$ref": "#/definitions/layer" }
+        },
+        "view-class-android": { "type": "string" },
+        "view-class-ios": { "type": "string" },
+        "direction": { "type": "string", "enum": ["horizontal", "vertical"] },
+        "column": { "type": "integer", "minimum": 1 },
+        "item-spacing": { "type": "number" },
+        "row-spacing": { "type": "number" },
+        "line-spacing": { "type": "number" },
+        "interitem-spacing": { "type": "number" },
+        "edge-insets": { "type": "string" },
+        "gravity": { "type": "string", "enum": ["top", "bottom", "center"] },
+        "scroll-enable": { "type": "boolean" },
+        "slider-scroll-time-interval": { "type": "number" },
+        "slider-infinity-scroll": { "type": "boolean" },
+        "slider-has-indicator": { "type": "boolean" },
+        "slider-selected-index": { "type": "integer" },
+        "slider-indicator-selected-color": { "type": "string" },
+        "slider-indicator-unselected-color": { "type": "string" },
+        "slider-indicator-margin": { "type": "string" },
+        "slider-indicator-position": { "type": "string" },
+        "slider-indicator-class-android": { "type": "string" },
+        "slider-indicator-class-ios": { "type": "string" },
+        "stroke-color": { "type": "string" },
+        "trail-color": { "type": "string" },
+        "progress-type": { "type": "string", "enum": ["line"] },
+        "animated": { "type": "boolean" }
+      }
+    }
+  }
+}

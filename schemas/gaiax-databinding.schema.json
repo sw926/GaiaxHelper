@@ -1,0 +1,239 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GaiaX DataBinding (index.databinding)",
+  "description": "GaiaX 数据/事件/埋点/动画绑定。键必须是本模板 index.json 中的图层 id（含根 id）。",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "description": "数据绑定。第一层级 key = index.json 图层 id",
+      "additionalProperties": { "$ref": "#/definitions/dataNode" }
+    },
+    "event": {
+      "type": "object",
+      "description": "事件绑定。第一层级 key = index.json 图层 id",
+      "additionalProperties": {
+        "description": "事件表达式（对象或数组形式）",
+        "anyOf": [
+          { "$ref": "#/definitions/eventNode" },
+          {
+            "type": "array",
+            "items": { "$ref": "#/definitions/eventNode" }
+          }
+        ]
+      }
+    },
+    "track": {
+      "type": "object",
+      "description": "手动埋点。第一层级 key = index.json 图层 id，tap/longpress 触发时随 onManualClickTrackEvent 回调",
+      "additionalProperties": { "type": "object" }
+    },
+    "config": {
+      "type": "object",
+      "description": "配置表达式",
+      "additionalProperties": { "type": "string" }
+    },
+    "animation": {
+      "type": "object",
+      "description": "动画绑定。第一层级 key = index.json 图层 id",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["'LOTTIE'", "'PROP'"],
+            "description": "动画类型表达式（单引号字符串）：LOTTIE 帧动画 / PROP 属性动画"
+          },
+          "trigger": {
+            "type": "boolean",
+            "description": "true 手动触发（需与 state 配合），false 自动"
+          },
+          "state": {
+            "type": "string",
+            "description": "业务传值表达式"
+          },
+          "lottieAnimator": {
+            "type": "object",
+            "properties": {
+              "value": { "type": "string", "description": "本地 lottie 资源名（表达式）" },
+              "url": { "type": "string", "description": "远程 lottie URL（表达式）" },
+              "loop": { "type": "boolean", "description": "循环（仅自动播放生效）" },
+              "bundle": { "type": "string", "description": "iOS bundle 名（仅 iOS 有效）" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "dataNode": {
+      "type": "object",
+      "description": "图层的数据绑定节点",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "节点主数据表达式：文本/图片URL/容器列表($nodes)/嵌套模板数据($$)。⚠️ 字符串字面量必须单引号，如 '静态文本'"
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "图片占位图表达式，如 'local:default'"
+        },
+        "mode": {
+          "type": "string",
+          "description": "image 裁剪模式表达式（单引号），如 'aspectFill'"
+        },
+        "mode-type": {
+          "type": "string",
+          "description": "image 裁剪类型表达式（单引号）：'scale' / 'crop'"
+        },
+        "accessibilityDesc": {
+          "type": "string",
+          "description": "无障碍文案（表达式）"
+        },
+        "accessibilityEnable": {
+          "type": "string",
+          "description": "无障碍开关（表达式，默认 true，优先于 Desc）"
+        },
+        "accessibilityTraits": {
+          "type": "string",
+          "description": "无障碍角色（表达式）：'button'/'image'/'text'/'none'/'header'"
+        },
+        "extend": {
+          "type": "object",
+          "description": "样式/属性覆写：每键为 CSS 属性名，值为表达式——字符串字面量必须带单引号，如 {\"color\": \"'red'\"}、{\"display\": \"$hide ? 'none' : 'flex'\"}；未列出的键（宿主扩展/design token）也允许",
+          "properties": {
+            "display": { "type": "string", "description": "显示类型：'flex' / 'none'（条件显隐最常用：$data.show ? 'flex' : 'none'）" },
+            "position": { "type": "string", "description": "定位方式：'relative' / 'absolute'" },
+            "left": { "type": "string", "description": "距左偏移（仅 position:absolute 生效），如 '$data.x + \"px\"'" },
+            "right": { "type": "string", "description": "距右偏移（仅 position:absolute 生效）" },
+            "top": { "type": "string", "description": "距顶偏移（仅 position:absolute 生效）" },
+            "bottom": { "type": "string", "description": "距底偏移（仅 position:absolute 生效）" },
+            "flex-direction": { "type": "string", "description": "主轴方向：'row' / 'column' / 'row-reverse' / 'column-reverse'" },
+            "flex-wrap": { "type": "string", "description": "换行方式：'nowrap' / 'wrap' / 'wrap-reverse'" },
+            "overflow": { "type": "string", "description": "溢出处理：'visible' / 'hidden' / 'scroll'" },
+            "align-items": { "type": "string", "description": "交叉轴对齐：'flex-start' / 'flex-end' / 'center' / 'baseline' / 'stretch'" },
+            "align-self": { "type": "string", "description": "自身对齐：'auto' + align-items 全集" },
+            "align-content": { "type": "string", "description": "多行交叉轴对齐：'flex-start' / 'flex-end' / 'center' / 'space-around' / 'space-between' / 'stretch'" },
+            "justify-content": { "type": "string", "description": "主轴对齐：'flex-start' / 'flex-end' / 'center' / 'space-around' / 'space-between' / 'space-evenly'" },
+            "flex-grow": { "type": "string", "description": "弹性增长系数（数字表达式）" },
+            "flex-shrink": { "type": "string", "description": "弹性收缩系数（数字表达式）" },
+            "flex-basis": { "type": "string", "description": "弹性基准尺寸" },
+            "width": { "type": "string", "description": "宽度。尺寸含单位需拼接：$count * 10 + 10 + 'px'；或条件：$vip ? '100px' : '80px'" },
+            "height": { "type": "string", "description": "高度（写法同 width）" },
+            "min-width": { "type": "string", "description": "最小宽度" },
+            "min-height": { "type": "string", "description": "最小高度" },
+            "max-width": { "type": "string", "description": "最大宽度" },
+            "max-height": { "type": "string", "description": "最大高度" },
+            "aspect-ratio": { "type": "string", "description": "宽高比：数字（宽/高）或 w:h（冒号写法仅 Android）" },
+            "margin": { "type": "string", "description": "外边距（仅单值；多值简写 Android 整模板渲染失败）" },
+            "margin-left": { "type": "string", "description": "左外边距" },
+            "margin-right": { "type": "string", "description": "右外边距" },
+            "margin-top": { "type": "string", "description": "上外边距" },
+            "margin-bottom": { "type": "string", "description": "下外边距" },
+            "padding": { "type": "string", "description": "内边距（仅单值；多值简写 Android 整模板渲染失败）" },
+            "padding-left": { "type": "string", "description": "左内边距" },
+            "padding-right": { "type": "string", "description": "右内边距" },
+            "padding-top": { "type": "string", "description": "上内边距" },
+            "padding-bottom": { "type": "string", "description": "下内边距" },
+            "border": { "type": "string", "description": "布局占位边框（尺寸值）" },
+            "border-width": { "type": "string", "description": "视觉边框宽度" },
+            "border-color": { "type": "string", "description": "边框颜色（颜色字符串要单引号：'#333333'）" },
+            "border-radius": { "type": "string", "description": "圆角" },
+            "border-top-left-radius": { "type": "string", "description": "左上圆角" },
+            "border-top-right-radius": { "type": "string", "description": "右上圆角" },
+            "border-bottom-left-radius": { "type": "string", "description": "左下圆角" },
+            "border-bottom-right-radius": { "type": "string", "description": "右下圆角" },
+            "font-size": { "type": "string", "description": "字体大小，如 '$big ? \"16px\" : \"14px\"'" },
+            "font-family": { "type": "string", "description": "字体族/design token/iconfont" },
+            "font-weight": { "type": "string", "description": "字体粗细：'normal' / 'bold' / '100'-'700'" },
+            "color": { "type": "string", "description": "文字颜色：'#333333'（hex 要单引号）；text 节点支持 linear-gradient" },
+            "line-height": { "type": "string", "description": "行高" },
+            "lines": { "type": "string", "description": "最大行数（GaiaX 扩展，数字表达式）" },
+            "text-overflow": { "type": "string", "description": "文本溢出：'ellipsis' / 'clip'（Android 需注册扩展）/ 'middle'" },
+            "text-align": { "type": "string", "description": "文本对齐：'left' / 'right' / 'center' / 'justify'（justify 仅 iOS）" },
+            "text-decoration": { "type": "string", "description": "文本装饰：'underline' / 'line-through'" },
+            "background-color": { "type": "string", "description": "背景颜色（颜色字符串要单引号）" },
+            "background-image": { "type": "string", "description": "背景图/渐变：'linear-gradient(to bottom, #d0021b, #f5a623)'（整串要单引号）" },
+            "opacity": { "type": "string", "description": "透明度 0~1（数字表达式）" },
+            "box-shadow": { "type": "string", "description": "盒阴影 'x y blur spread color' 五段（iOS 忽略 spread）" },
+            "backdrop-filter": { "type": "string", "description": "背景滤镜：'none' / 'blur(10px)'" },
+            "hidden": { "type": "string", "description": "占位不可见（仅 Android）：'true' / 'false'" },
+            "fit-content": { "type": "string", "description": "文字按内容自适应宽（Android 实测有效）：'true' / 'false'" },
+            "includeFontPadding": { "type": "string", "description": "字体内边距（仅 Android）：'true' / 'false'" },
+            "mode": { "type": "string", "description": "image 裁剪模式：'scaleToFill' / 'aspectFill' / 'aspectFit' / 'top' / 'bottom' / 'center' / 'left' / 'right'（iOS 另接受 'cover' / 'contain'）" },
+            "mode-type": { "type": "string", "description": "image 裁剪类型：'scale' / 'crop'" },
+            "background-size": { "type": "string", "description": "背景尺寸（mode 别名，仅 iOS）：'cover' / 'contain'" },
+            "background-url": { "type": "string", "description": "背景图 URL（下载吸色作背景色，仅 iOS）" },
+            "highlight-tag": { "type": "string", "description": "richtext 高亮包裹符，如 '#'" },
+            "highlight-color": { "type": "string", "description": "richtext 高亮颜色，如 '#00ff00'" },
+            "highlight-font-size": { "type": "string", "description": "richtext 高亮字号（⚠️ 与 font-weight 不能同时用）" },
+            "highlight-font-weight": { "type": "string", "description": "richtext 高亮字重" },
+            "highlight-font-family": { "type": "string", "description": "richtext 高亮字体" },
+            "column": { "type": "string", "description": "grid 列数（数字表达式，运行时覆盖）" },
+            "item-spacing": { "type": "string", "description": "容器坑位间距（表达式，如 \"'9px'\"）" },
+            "row-spacing": { "type": "string", "description": "grid 行间距" },
+            "scroll-enable": { "type": "string", "description": "grid 自身可滚动" },
+            "gravity": { "type": "string", "description": "scroll 横滑坑位垂直对齐：'top' / 'bottom' / 'center'" },
+            "itemSameHeight": { "type": "string", "description": "grid 性能键（仅一列时）：true=首条高度×行数" },
+            "item-type": {
+              "type": "object",
+              "description": "scroll/grid 多坑位类型映射：按 path 表达式求值结果选 config 中的模板",
+              "properties": {
+                "path": { "type": "string", "description": "取值表达式，如 $type" },
+                "config": {
+                  "type": "object",
+                  "description": "值 → 子模板 ID 映射",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            },
+            "item-footer-type": {
+              "type": "object",
+              "description": "加载更多坑位",
+              "properties": {
+                "id": { "type": "string", "description": "footer 子模板 ID（表达式）" },
+                "hasMore": { "type": "string", "description": "是否还有更多（表达式）" }
+              }
+            },
+            "holding-offset": { "type": "string", "description": "scroll 滚动定位总开关（true 时下列滚动键生效）" },
+            "scroll-index": { "type": "string", "description": "scroll 初始定位坑位 index（数字表达式）" },
+            "scroll-position": { "type": "string", "description": "scroll 定位方式：'center' 等" },
+            "scroll-animated": { "type": "string", "description": "scroll 定位是否带动画" }
+          },
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "eventNode": {
+      "type": "object",
+      "description": "单个事件绑定",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "事件类型表达式（单引号字符串）。tap（默认）/ longpress / click（JS 场景 tap 别名）；其他值 Android 忽略、iOS 按 tap"
+        },
+        "value": {
+          "type": "string",
+          "description": "事件参数表达式，求值结果随回调透出"
+        },
+        "params": {
+          "type": "object",
+          "description": "事件参数（每键为表达式）",
+          "additionalProperties": { "type": "string" }
+        },
+        "eventType": {
+          "type": "string",
+          "description": "iOS 另接受的键（优先于 type）"
+        },
+        "option": {
+          "type": "object",
+          "description": "iOS/JS 混合事件优先级",
+          "properties": {
+            "cover": { "type": "boolean" },
+            "level": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}

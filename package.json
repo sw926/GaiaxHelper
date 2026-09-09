@@ -1,0 +1,80 @@
+{
+  "name": "gaiax-helper",
+  "displayName": "GaiaX Helper",
+  "description": "GaiaX 模板开发辅助：JSON/CSS/DataBinding 相互跳转、id 智能补全、GaiaX V2 表达式校验与内置 JSON Schema 校验",
+  "version": "0.6.0",
+  "publisher": "sw926",
+  "license": "MIT",
+  "pricing": "Free",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sw926/GaiaxHelper"
+  },
+  "homepage": "https://github.com/sw926/GaiaxHelper",
+  "bugs": {
+    "url": "https://github.com/sw926/GaiaxHelper/issues"
+  },
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "gaiax",
+    "template",
+    "databinding",
+    "css",
+    "json",
+    "mobile",
+    "cross-platform"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/index.json",
+    "workspaceContains:**/index.css",
+    "workspaceContains:**/index.databinding"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "**/index.json",
+        "url": "./schemas/gaiax-template.schema.json"
+      },
+      {
+        "fileMatch": "**/index.databinding",
+        "url": "./schemas/gaiax-databinding.schema.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "json",
+        "extensions": [
+          ".databinding"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "test:expression": "npm run compile && node scripts/test-expression-validator.cjs"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.98.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "typescript": "^5.8.2",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
